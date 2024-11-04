@@ -1,5 +1,10 @@
 # CSE_151A_Project
 
+## Dataset Details
+
+The folder with the dataset is linked [here](https://drive.google.com/drive/folders/1YwGAiLkXr5lPY1PL1VM97KHVrMha24rm?usp=sharing).
+The original dataset and its details can be found [here](https://archive.ics.uci.edu/dataset/417/character+font+images) via the UC Irvine Machine Learning Repository from Richard Lyman.
+
 ## [Data Exploration Jupyter Notebook](CSE_151_Project_Data_Exploration.ipynb)
 
 ## Data Preprocessing
