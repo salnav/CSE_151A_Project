@@ -22,9 +22,13 @@ The original dataset and its details can be found [here](https://archive.ics.uci
 
 ## Milestone 2
 
+#### [Data_Preprocessing Jupyter Notebook](Data_Preprocessing.ipynb)
+
 ### Major Preprocessing
 
 I did the major preprocessing on the data by removing all of the columns except for the 400 pixel columns (features) and the m_label column (target) which represents the characters. I did not include the other features such as the font or the strength of the text which was in the original dataset because I thought it would add unnecessary complexity to the model for a baseline and would require modified CNN, but I might add them in future iterations of the model if I feel like it will help. I normalized the pixel values to make them range from 0 to 1 and did so by dividing by 255 (the max). I then split the data using train_test_split to split the data into 80% train and then I ran test_train_split again on the rest of the 20%, so I had an 80-10-10 train, validation, test split. I then converted these data splits to tensors, so I could store them in pt files which allows me to load up the preprocessed data without having to use pandas or spark everytime.
+
+#### [Model and Training Notebook](Model_One.ipynb)
 
 ### Model
 
