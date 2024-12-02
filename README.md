@@ -1,6 +1,6 @@
 # CSE_151A_Project
 
-## Milestone 1
+## Milestone 2
 
 ### Dataset Details
 
@@ -20,7 +20,7 @@ The original dataset and its details can be found [here](https://archive.ics.uci
 - Subsample if the dataset is too large for the training step.
 - Use binary encoding for the m_label class due to the large number of labels and the current ordinal numbers not being ideal.
 
-## Milestone 2
+## Milestone 3
 
 #### [Data_Preprocessing Jupyter Notebook](Data_Preprocessing.ipynb)
 
@@ -49,6 +49,37 @@ The accuracy on the test set after training was 76.95%. After the first epoch th
 
 At the moment I do not think I will change the model's architecture, but I will just tweak the hyperparameters such as the number of epochs and the learning rate to see if I can minimize the loss even more and increase the accuracy. Based on the fit graph it seems to be learning well (without overfitting), but it just needs to train more to lessen the loss, so increasing those 2 parameters could help with that. In future iterations of the model I will consider more complex models like ResNets or adding features like the font to the feedforward network input, but right now I will stick with this model and just tweak the hyperparameters.
 
+## Edit
+
+After tuning the hyperparameters such as increasing the # of epochs and using a learning rate of 0.001 I was able to achieve an accuracy of 79.02% and a better fit. The updated fit graph is below and the updated code with these hyperparameters can be found here: [Model_One_Tuned.ipynb](Model_One_Tuned.ipynb)
+
+![fit](fit_graph_model_one_tuned.png)
+
+## Milestone 4
+
+#### [Model and Training Notebook](Model_Two.ipynb)
+
+### Model
+
+I implemented a ResNet to try to improve upon the CNN results from before by preventing any potential problems with a vanishing gradient. To do this I implemented a ResidualBlock class which represents a residual block that performs convolution with batch normalization and ReLU activation and adds the original input to the output of the convolution layer (skip connection). In the model as a whole, I used an initial convolutional layer with 2 subsequent residual blocks and max pooling layers. The first residual block increases the output channels from 32 to 64 and the second block increases it from 64 to 128. Next, the output is flattened and passed into a three layer fully connected network that outputs the character probabilities. I chose to use a ResNet and residual blocks because with the large number of unique classes (11,475 different characters) I thought using the residuals could add necessary complexity to the model that could improve the accuracy of the character predictions. In other words, the ResNet can learn deeper features which is needed due to the complex task of classifying 11,475 different characters.
+
+### Training
+
+For training, as before I loaded up the dataset and made the pixels into 20x20 tensors. I tried different combinations of hyperparameters, but ultimately got the best accuracy on the test data and fit (not overfitted or underfitted) after training multiple times. For loss, I used CrossEntropyLoss with label_smoothing set to 0.1 to prevent overfitting and make the model generalize better on unseen data. For optimization, I used Adam optimizer with a learning rate of 0.001 and a weight decay of 0.01 to prevent the train and validation loss to diverge and in turn to prevent overfitting. I also added a scheduler by using the pytorch StepLR with a step size of 2 and 0.5 which halves the learning rate every 2 epochs, so the the learning rate does not overshoot the optimal model. I used 10 epochs because that is where the model seemed to peak and a batch-size of 128 for a more efficient learning process. The model took around 20 minutes to train using an A100 GPU.
+
+### Evaluation
+
+The accuracy on the test set after training was 82.74% and 82.94% on the validation set. After the first epoch, the validation accuracy was 72.78% which is much higher than the accuracy of the CNN after the first epoch which was 67.56%, which means the ResNet learned better intially. After the initial drop of the test loss, the test loss and validation loss are near each other (with test loss being only a little lower) and drop steadily as the number of epochs increase. This indicates there is not a lot of overfitting and the model is fitting the data correctly and generalizing well. The trained model accurately predicted 4/5 character images (below) for the test and validation set and 3/5 character for the train set, which is also a sign of the model generalizing well. The model still has a problem with characters that are very similar which maybe improved with a more complex model albiet a more complex model may cause overfitting if not implemented correctly.
+
+![fit](fit_graph_model_two.png)
+![ground truth vs predictions](ground_truth_pred_model_2_1.png)
+![ground truth vs predictions](ground_truth_pred_model_2_2.png)
+![ground truth vs predictions](ground_truth_pred_model_2_3.png)
+
+### Conclusion
+
+Between the first and the second model there was almost a +4% increase in accuracy, so the ResNet is definitely an improvement over the CNN. The model still has minor issues with classifying characters that are very similar with others (a pixel or two different) or characters that are very niche and don't show up much in the dataset. To improve this, in my next model I think increasing the number of feature maps that the convolution and residual blocks generate would be beneficial to extract more features from the characters to handle these small characters. Also, I think potentially increasing the number of layers in the fully-connected network could potentially help the model learn more and classify the output better. All in all, I think increasing complexity in the form of adding more output channels, potentially adding more residual blocks (or convolutional layers), and layers in the fully-connected network could be an improvement over this model and could handle edgecases that are causing the accuracy to be lower than it should be.
+
 #### Resources Used
 
 - PyTorch Documentation (CNN class)
@@ -59,6 +90,7 @@ At the moment I do not think I will change the model's architecture, but I will 
     - "Give a function to evaluate the model at each step" (evalute function)
     - "Give me code that plots the loss and accuracy from a train and validation array that has these values stored for each epoc" (cell which contains the plotting code"
     - "Give me code that plots 5 each for valid, test, train for the ground truth and predictions if I have 20x20 images"
+    - "How could I implement a residual block class for a ResNet in pytorch?"
 
 
 
