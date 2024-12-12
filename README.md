@@ -276,6 +276,9 @@ Contribution: I did this project on my own (solo group), so I did all the work f
 - Numpy Documentation
 - Matplotlib Documentation
 - I used ChatGPT to assist in creating the visuals for this project such as the fit graph and the ground truth vs prediction images. It also assisted in writing this report,converting my writing to markdown, and making it better structured and professional grammar wise.
+- Lyman, Richard. "Character Font Images." UC Irvine Machine Learning Repository. https://archive.ics.uci.edu/dataset/417/character+font+images.
+- Shdangwal. "A ResNet Architecture Model Diagram." Medium. https://medium.com/@shdangwal/a-brief-and-simple-introduction-to-resnet-47432eff95b8.
+- InterviewBit. https://www.interviewbit.com/blog/cnn-architecture/
 
 
 
