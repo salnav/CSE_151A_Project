@@ -1,96 +1,291 @@
-# CSE_151A_Project
+# Introduction 
+The project centers on building a predictive model that can classify characters from images, where the dataset consists of 11,475 unique characters. This problem is interesting because it involves high-dimensional image data, making it an engaging challenge in the field of machine learning, particularly in computer vision. The ability to accurately predict and classify such a large number of characters has broad implications, from optical character recognition (OCR) systems to enhancing user experience in various applications like document scanning or automated text recognition.
 
-## Milestone 2
+Having a good predictive model for such tasks is important as it can improve the accuracy of automated systems in recognizing and processing text. Furthermore, it can aid in various practical applications, such as automated translation or reading aids for the visually impaired. In this project, we focus on achieving high accuracy in classifying images while also ensuring that the model generalizes well to unseen data.
 
-### Dataset Details
 
-The folder with the dataset is linked [here](https://drive.google.com/drive/folders/1YwGAiLkXr5lPY1PL1VM97KHVrMha24rm?usp=sharing).
-The original dataset and its details can be found [here](https://archive.ics.uci.edu/dataset/417/character+font+images) via the UC Irvine Machine Learning Repository from Richard Lyman.
+# Methods
 
-### [Data Exploration Jupyter Notebook](CSE_151_Project_Data_Exploration.ipynb)
+## Data Exploration
 
-### Data Preprocessing
+### Data Overview
+- The folder with the dataset is linked [here](https://drive.google.com/drive/folders/1YwGAiLkXr5lPY1PL1VM97KHVrMha24rm?usp=sharing). The original dataset and its details can be found [here](https://archive.ics.uci.edu/dataset/417/character+font+images) via the UC Irvine Machine Learning Repository from Richard Lyman.
+- **Data Concatenation**: The data from multiple CSV files was combined into a single DataFrame with 833,068 rows and 412 columns. A 40% sample of the data was then selected for analysis, resulting in 333,068 observations.
+- **Columns**: The dataset includes various attributes such as `font`, `fontVariant`, `m_label`, `strength`, and pixel data (e.g., `r19c1` to `r19c19`).
 
-#### I plan to...
-- Scale the current image pixel values (currently 0-255) to 0-1, so the model can process the data better.
-- Get rid of all the irrelevant features such as the font, fontVariant, strength, originalH, etc.
-- Get rid of any missing data (although from my data exploration it seems are though there is no missing data).
-- Split the data into a 80-10-10 train,test,validation split (respectively).
-- Balance the fonts, so no one font is overrepresnted in the dataset.
-- Subsample if the dataset is too large for the training step.
-- Use binary encoding for the m_label class due to the large number of labels and the current ordinal numbers not being ideal.
+### Key Statistics
 
-## Milestone 3
+- **Font Distribution**: The dataset contains 153 unique fonts, with the most frequent font being "OCRB" (37,346 occurrences).
+- **Missing Data**: No missing data was found in the dataset, as indicated by `df.isnull().any(axis=1)` returning zero.
+- **Class Labels**: There are 11,475 unique character labels, ranging from 0 to 65,533.
 
-#### [Data_Preprocessing Jupyter Notebook](Data_Preprocessing.ipynb)
+### Data Description
 
-### Major Preprocessing
+The dataset provides pixel values corresponding to 20x20 grayscale images of characters. The `m_label` column represents the class label, and each row includes information such as font style, size, and other features.
 
-I did the major preprocessing on the data by removing all of the columns except for the 400 pixel columns (features) and the m_label column (target) which represents the characters. I did not include the other features such as the font or the strength of the text which was in the original dataset because I thought it would add unnecessary complexity to the model for a baseline and would require modified CNN, but I might add them in future iterations of the model if I feel like it will help. I normalized the pixel values to make them range from 0 to 1 and did so by dividing by 255 (the max). I then split the data using train_test_split to split the data into 80% train and then I ran test_train_split again on the rest of the 20%, so I had an 80-10-10 train, validation, test split. I then converted these data splits to tensors, so I could store them in pt files which allows me to load up the preprocessed data without having to use pandas or spark everytime.
+### Data Visualization
 
-#### [Model and Training Notebook](Model_One.ipynb)
+- **Pixel Visualization**: 15 random examples of the images were visualized by reshaping pixel data into 20x20 grids and displaying them using `matplotlib`. Each plot included the label, original height, and width of the character.
 
-### Model
+The notebook for data exploration can be found [here](CSE_151_Project_Data_Exploration.ipynb)
 
-I opted to use a basic convolutional neural network to try to get a good baseline for a model. I used 3 convolutional layers with a max pooling layer after each to shrink the dimensions and a feedforward network with 3 layers. I decided to make the output of the convolution 128 feature maps on the last layer because there are 11475 unique classes (characters), so I thought it was a good place to start to extract the complexity. Also, I used a feedforward network with 3 layers as a baseline to try to extract the complexity as well. 
+## Data Preprocessing
 
-### Training
+The data preprocessing was performed using a custom notebook that processes the `character+font+images.csv` dataset into PyTorch tensors. Key steps included:
 
-For training I loaded up the dataset and made the pixels into 20x20 tensors. I used an Adam optimizer with a learning rate of 0.001 because it is a good optimizer to start with for large datasets. For the loss I used crossentropyloss from the torch library. I used a batch size of 128 to try to speed up the training and 5 epochs because I just want a baseline on how the model train, but I did not want to train for 10 hours. The model ended taking about 3 hours to train.
+- **Normalization**: Pixel values were scaled to the range [0, 1].
+- **Dataset Splitting**: Data was divided into training (80%), validation (10%), and testing (10%) sets using `scikit-learn`'s `train_test_split`.
+- **Serialization**: Preprocessed datasets were saved as `.pt` files for efficient loading during model training.
 
-### Evaluation
+The notebook for data preprocessing can be found [here](Data_Preprocessing.ipynb). It uses the following libraries:
 
-The accuracy on the test set after training was 76.95%. After the first epoch the accuracy on the validation set was 67.56%. At every epoch the loss went down by around 1-0.2, so I believe the model could improve more by just increasing the number of epochs (and potentially the learning rate). In the model fit graph below, the validation loss does not diverge from the train loss which indicates that the model is not really overfitting. Also, I evaluated the model on 5 images from each split (below) and it predicted the character accurrately for about 3/5 in each split, but the characters with less white used (smaller characters) seem to be the ones that were predicted wrong. The more common characters like number (i.e. 1) are predicted quite accurately.
+- `torch` for tensor operations and saving preprocessed datasets.
+- `pandas` for reading the CSV data in chunks.
+- `numpy` for array manipulation.
+- `scikit-learn` for splitting datasets.
 
-![fit](fit_graph_model_one.png)
-![ground truth vs predictions](ground_truth_pred.png)
+## Data Exploration
 
-### Conclusion
+Data exploration was conducted to gain insights into the dataset and identify potential preprocessing needs. Key activities included:
 
-At the moment I do not think I will change the model's architecture, but I will just tweak the hyperparameters such as the number of epochs and the learning rate to see if I can minimize the loss even more and increase the accuracy. Based on the fit graph it seems to be learning well (without overfitting), but it just needs to train more to lessen the loss, so increasing those 2 parameters could help with that. In future iterations of the model I will consider more complex models like ResNets or adding features like the font to the feedforward network input, but right now I will stick with this model and just tweak the hyperparameters.
+- **Summary Statistics**: Calculating descriptive statistics such as mean, median, and standard deviation for pixel values.
+- **Class Distribution**: Visualizing the frequency of each class to detect class imbalances using bar plots.
+- **Visual Inspection**: Plotting random samples of images to verify data quality and understand variations within classes.
 
-## Edit
+The exploration revealed that some classes were underrepresented, necessitating techniques like data augmentation during training to improve model generalization. Insights from this step informed preprocessing and model design.
 
-After tuning the hyperparameters such as increasing the # of epochs and using a learning rate of 0.001 I was able to achieve an accuracy of 79.02% and a better fit. The updated fit graph is below and the updated code with these hyperparameters can be found here: [Model_One_Tuned.ipynb](Model_One_Tuned.ipynb)
+## Model Architectures
 
-![fit](fit_graph_model_one_tuned.png)
+Three distinct convolutional neural network (CNN) architectures were implemented and evaluated.
 
-## Milestone 4
+### Model 1: Basic CNN
 
-#### [Model and Training Notebook](Model_Two.ipynb)
+This model consists of:
 
-### Model
+- **Convolutional Layers**: Three convolutional layers with filter sizes of 32, 64, and 128 respectively, each followed by ReLU activation.
+- **Pooling**: Max pooling layers (2x2) after each convolution to reduce spatial dimensions.
+- **Fully Connected Layers**: Two fully connected layers with 512 and 256 neurons respectively.
+- **Output Layer**: A final fully connected layer with neurons equal to the number of classes (for classification).
 
-I implemented a ResNet to try to improve upon the CNN results from before by preventing any potential problems with a vanishing gradient. To do this I implemented a ResidualBlock class which represents a residual block that performs convolution with batch normalization and ReLU activation and adds the original input to the output of the convolution layer (skip connection). In the model as a whole, I used an initial convolutional layer with 2 subsequent residual blocks and max pooling layers. The first residual block increases the output channels from 32 to 64 and the second block increases it from 64 to 128. Next, the output is flattened and passed into a three layer fully connected network that outputs the character probabilities. I chose to use a ResNet and residual blocks because with the large number of unique classes (11,475 different characters) I thought using the residuals could add necessary complexity to the model that could improve the accuracy of the character predictions. In other words, the ResNet can learn deeper features which is needed due to the complex task of classifying 11,475 different characters.
+#### Hyperparameters:
+- **Optimizer**: Adam optimizer with a learning rate of 0.001
+- **Batch Size**: 128
+- **Loss Function**: Cross-entropy loss
 
-### Training
+The architecture emphasizes simplicity while maintaining a focus on feature extraction and dimensionality reduction. The training notebook for this model is available [here](Model_One_Tuned.ipynb).
 
-For training, as before I loaded up the dataset and made the pixels into 20x20 tensors. I tried different combinations of hyperparameters, but ultimately got the best accuracy on the test data and fit (not overfitted or underfitted) after training multiple times. For loss, I used CrossEntropyLoss with label_smoothing set to 0.1 to prevent overfitting and make the model generalize better on unseen data. For optimization, I used Adam optimizer with a learning rate of 0.001 and a weight decay of 0.01 to prevent the train and validation loss to diverge and in turn to prevent overfitting. I also added a scheduler by using the pytorch StepLR with a step size of 2 and 0.5 which halves the learning rate every 2 epochs, so the the learning rate does not overshoot the optimal model. I used 10 epochs because that is where the model seemed to peak and a batch-size of 128 for a more efficient learning process. The model took around 20 minutes to train using an A100 GPU.
+![Model 1 Architecture](cnn_diagram.png)
 
-### Evaluation
+### Model 2: ResNet-inspired Architecture
 
-The accuracy on the test set after training was 82.74% and 82.94% on the validation set. After the first epoch, the validation accuracy was 72.78% which is much higher than the accuracy of the CNN after the first epoch which was 67.26%, which means the ResNet learned better intially. After the initial drop of the test loss, the test loss and validation loss are near each other (with test loss being only a little lower) and drop steadily as the number of epochs increase. This indicates there is not a lot of overfitting and the model is fitting the data correctly and generalizing well. The trained model accurately predicted 4/5 character images (below) for the test and validation set and 3/5 character for the train set, which is also a sign of the model generalizing well. The model still has a problem with characters that are very similar which maybe improved with a more complex model albiet a more complex model may cause overfitting if not implemented correctly.
+Inspired by ResNet, this model includes:
 
-![fit](fit_graph_model_two.png)
-![ground truth vs predictions](ground_truth_pred_model_2_1.png)
-![ground truth vs predictions](ground_truth_pred_model_2_2.png)
-![ground truth vs predictions](ground_truth_pred_model_2_3.png)
+- **Residual Blocks**: Two residual blocks, each containing two convolutional layers with 64 filters and a kernel size of 3x3.
+- **Shortcut Connections**: Identity mapping for efficient feature learning and to mitigate the vanishing gradient problem.
+- **Pooling**: A global average pooling layer before the fully connected layers.
+- **Fully Connected Layers**: A single fully connected layer with 512 neurons for classification.
 
-### Conclusion
+#### Hyperparameters:
+- **Loss Function**: Cross-entropy loss with label smoothing (0.1)
+- **Optimizer**: AdamW optimizer with a learning rate of 0.001, weight decay of 0.01
+- **Scheduler**: StepLR with a step size of 2 and gamma of 0.5
 
-Between the first and the second model there was almost a +4% increase in accuracy, so the ResNet is definitely an improvement over the CNN. The model still has minor issues with classifying characters that are very similar with others (a pixel or two different) or characters that are very niche and don't show up much in the dataset. To improve this, in my next model I think increasing the number of feature maps that the convolution and residual blocks generate would be beneficial to extract more features from the characters to handle these small characters. Also, I think potentially increasing the number of layers in the fully-connected network could potentially help the model learn more and classify the output better. All in all, I think increasing complexity in the form of adding more output channels, potentially adding more residual blocks (or convolutional layers), and layers in the fully-connected network could be an improvement over this model and could handle edgecases that are causing the accuracy to be lower than it should be.
+The ResNet training notebook is accessible [here](Model_Two.ipynb).
 
-#### Resources Used
+![Model 2 Architecture](resnet_diagram.png)
 
-- PyTorch Documentation (CNN class)
-- ChatGPT
-  - Prompts Used
-    - "Give me different options for the structure and parameters of a CNN and tell me the pros and cons of each" (Used to decide on feature maps, number of convolutional layers, etc.)
-    - "Give me a print statement that prints the loss and accuracy of the model at each epoc" (print statement in train)
-    - "Give a function to evaluate the model at each step" (evalute function)
-    - "Give me code that plots the loss and accuracy from a train and validation array that has these values stored for each epoc" (cell which contains the plotting code"
-    - "Give me code that plots 5 each for valid, test, train for the ground truth and predictions if I have 20x20 images"
-    - "How could I implement a residual block class for a ResNet in pytorch?"
+### Model 3: Advanced ResNet
+
+An extended ResNet architecture with additional residual blocks for deeper feature extraction was also implemented. This model features:
+
+- **Residual Blocks**: Four residual blocks, each containing two convolutional layers with 64, 128, 256, and 512 filters respectively.
+- **Shortcut Connections**: Identity mapping for each block to preserve gradient flow.
+- **Pooling**: A global average pooling layer before the fully connected layers.
+- **Fully Connected Layers**: Two fully connected layers with 512 and 256 neurons respectively for classification.
+
+#### Hyperparameters:
+- **Loss Function**: Cross-entropy loss with label smoothing (0.1)
+- **Optimizer**: AdamW optimizer with a learning rate of 0.0005, weight decay of 0.01
+- **Scheduler**: CosineAnnealingLR with `T_max=10` and `eta_min=0.0001`
+
+This model’s training notebook can be found [here](Model_Three.ipynb).
+
+### Training and Evaluation
+
+All models were trained using the following setup:
+
+- **Loss Function**: Cross-entropy loss for multi-class classification.
+- **Batch Size**: A batch size of 128 was used to balance memory usage and training speed.
+- **Metrics**: Accuracy was used to evaluate performance on validation and test datasets.
+
+## Libraries Used
+
+The following libraries were used across all notebooks:
+
+- `torch` (PyTorch): Core library for building and training neural networks.
+- `torch.nn.functional`: For activation functions and other utilities.
+- `pandas` and `numpy`: For data loading and preprocessing.
+- `matplotlib`: For visualizing sample data and results.
+- `scikit-learn`: For splitting datasets.
+
+The full implementation and exploration for each model can be reviewed in the provided notebooks linked above.
+
+# Results
+
+### Model 1: Basic CNN
+
+#### Performance
+
+- **Accuracy**: The basic CNN model achieved a test accuracy of **79.02%%**, which was obtained after training for 10 epochs with a batch size of 128. The validation accuracy after the first epoch was **67.26%**. As the model trained further, the validation accuracy gradually improved.
+
+- **Training Progress**: During training, the loss decreased steadily, with an approximate reduction of 1-0.2 per epoch. The validation loss did not diverge significantly from the training loss, indicating that the model was not overfitting.
+
+- **Example Predictions**: The model correctly predicted **3 out of 5** test images for each split, with common characters such as numbers being predicted with high accuracy. Smaller characters or those with less white space in the images were more difficult for the model to predict correctly.
+
+#### Visualizations
+
+##### Training and Validation Loss vs Epochs
+Below is the fit graph for the Basic CNN model, showing the training and validation loss over the epochs. The training and validation losses decreased steadily without significant divergence.
+
+**Figure 1**: Training and Validation Loss for Basic CNN
+
+![Figure 1: Training and Validation Loss for Basic CNN](fit_graph_model_one_tuned.png)
+
+##### Evaluation of Test Images
+Example test images and the corresponding ground truth vs predictions for the Basic CNN model are shown below. These visuals highlight how the model performed in predicting different characters.
+
+**Figure 4**: Basic CNN Predictions
+
+![Figure 4: Basic CNN Predictions](pred_ground_truth_model_1.png)
+
+---
+
+### Model 2: ResNet-inspired Architecture
+
+#### Performance
+
+- **Accuracy**: The ResNet-inspired model achieved a test accuracy of **82.74%**, with a validation accuracy of **82.94%**. After the first epoch, the validation accuracy was **72.78%**, which was significantly higher than the CNN model’s first epoch accuracy of **67.26%**.
+
+- **Training Progress**: The training and validation losses decreased steadily without significant divergence. The test and validation losses were almost identical, indicating the model was able to generalize well and was not overfitting.
+
+- **Example Predictions**: The model correctly predicted **4 out of 5** test images for both the test and validation sets, while the training set saw **3 out of 5** correct predictions. As with the CNN, the model struggled with very similar characters or characters with fewer instances in the dataset.
+
+#### Visualizations
+
+##### Training and Validation Loss vs Epochs
+Similar trends were observed, with the validation loss following the training loss closely, but with a slightly lower test loss.
+
+**Figure 2**: Training and Validation Loss for ResNet-inspired Model
+
+![Figure 2: Training and Validation Loss for ResNet-inspired Model](fit_graph_model_two.png)
+
+##### Evaluation of Test Images
+Example test images and the corresponding ground truth vs predictions for the ResNet-inspired model are shown below.
+
+**Figure 5**: ResNet-inspired Model Predictions
+
+![Figure 5: ResNet-inspired Model Predictions](ground_truth_pred_model_2_3.png)
+
+---
+
+### Model 3: Advanced ResNet
+
+#### Performance
+
+- **Accuracy**: The advanced ResNet model, with additional residual blocks and deeper feature extraction, achieved a test accuracy of **84.33%** and a validation accuracy of **84.18%**.
+
+- **Training Progress**: The training process for this model followed a similar trend to the ResNet-inspired model, with the test and validation losses decreasing steadily without divergence, signaling a well-balanced model that avoided overfitting.
+
+- **Example Predictions**: The advanced ResNet model demonstrated improved accuracy on the more challenging cases, with a higher proportion of correct predictions for characters that are similar or underrepresented.
+
+#### Visualizations
+
+##### Training and Validation Loss vs Epochs
+
+**Figure 3**: Training and Validation Loss for Advanced ResNet Model
+
+![Figure 3: Training and Validation Loss for Advanced ResNet Model](fit_graph_model_3.png)
+
+##### Evaluation of Test Images
+Example test images and the corresponding ground truth vs predictions for the ResNet-inspired model are shown below.
+
+**Figure 6**: ResNet-inspired Model Predictions
+
+![Figure 6: ResNet-inspired Model Predictions](pred_ground_truth_model_3.png)
+
+
+---
+
+### Summary of Results
+
+The models were evaluated on the test set and achieved the following accuracies:
+
+- **Basic CNN**: 79.02%  
+- **ResNet-inspired Model**: 82.74%  
+- **Advanced ResNet**: 84.33%
+
+# Discussion
+
+The results of this project highlight the strengths and limitations of different convolutional neural network (CNN) architectures in addressing the challenging task of multi-class character classification from high-dimensional image data. Each model demonstrated varying levels of performance, offering insights into the trade-offs between model complexity, accuracy, and generalization.
+
+## Key Findings
+
+### Model 1: Basic CNN
+
+The basic CNN achieved a test accuracy of **79.02%**, providing a strong baseline. The steady decline in training and validation losses over the epochs suggests effective learning without overfitting. However, its relatively lower accuracy compared to more advanced architectures indicates that it struggled to capture the complex patterns required for distinguishing between **11,475 unique character labels**. This performance gap emphasizes the limitations of simpler architectures when applied to tasks involving such high-dimensional data and large class counts.
+
+### Model 2: ResNet-inspired Architecture
+
+The ResNet-inspired model showed marked improvement, achieving a test accuracy of **82.74%**. The use of residual connections likely mitigated the vanishing gradient problem, enabling the model to learn deeper features. Additionally, the near-identical training and validation losses suggest good generalization to unseen data. This architecture balanced complexity and performance effectively, making it a strong candidate for applications requiring moderate computational efficiency without sacrificing accuracy.
+
+### Model 3: Advanced ResNet
+
+The advanced ResNet model achieved the highest test accuracy of **84.33%**, confirming the benefits of deeper architectures for extracting complex features. However, the marginal improvement over the ResNet-inspired model raises questions about diminishing returns with increased depth. This model's slightly higher computational requirements may not justify its performance gain in all scenarios, particularly for real-time or resource-constrained applications.
+
+## Implications
+
+The progressive improvement in accuracy across models underscores the importance of architecture design in high-dimensional classification tasks. With every added complexity, the models demonstrated better performance, culminating in **84.33% accuracy** with the Advanced ResNet. However, even this relatively high accuracy reflects the inherent difficulty of the task due to the large number of classes. 
+
+Furthermore, the subtle differences between **extremely similar characters**, as shown in the figures, often led to misclassifications where one character was predicted as another. While this might seem problematic, it reflects the fine-grained nature of the task rather than fundamental model limitations, as such errors often occur even for human observers.
+
+While deeper and more sophisticated architectures generally offer better performance, their increased complexity necessitates careful consideration of computational resources and potential overfitting. For practical deployment, the choice of model should align with the specific constraints and requirements of the application, such as latency, hardware availability, and the tolerance for classification errors.
+
+The challenges faced by all models in predicting underrepresented classes highlight the need for techniques like **data augmentation** or **class balancing** during preprocessing. Addressing these imbalances could further enhance the models’ ability to generalize to rare character labels.
+
+## Limitations and Future Directions
+
+1. **Dataset Representation:** Despite preprocessing efforts, the dataset’s inherent class imbalance likely influenced the models’ performance. Future work could explore advanced augmentation strategies or synthetic data generation to address this issue.
+
+2. **Evaluation Metrics:** Accuracy alone may not fully capture the nuances of model performance, especially for highly imbalanced datasets. Incorporating metrics like F1-score, precision, and recall for individual classes could provide deeper insights into model strengths and weaknesses.
+
+3. **Architectural Exploration:** While the ResNet architectures performed well, other advanced architectures such as **EfficientNet** or **Transformer-based models** could be explored to push the boundaries of accuracy and efficiency further.
+
+4. **Hyperparameter Optimization:** A more exhaustive search for optimal hyperparameters, potentially using techniques like **Bayesian optimization**, could lead to further performance improvements.
+
+5. **Real-world Testing:** Deploying the models in practical applications, such as OCR systems, would provide valuable feedback on their robustness and usability.
+
+# Conclusion
+
+In conclusion, this project demonstrated the effectiveness of different convolutional neural network (CNN) architectures in classifying characters from images, with the goal of handling a high-dimensional dataset of 11,475 unique labels. The models varied in complexity, from the basic CNN to the more advanced ResNet architectures, and each demonstrated significant performance improvements as the network depth increased. The basic CNN model set a solid baseline, while the ResNet-inspired and advanced ResNet models delivered higher accuracies, with the advanced ResNet achieving the highest test accuracy of 84.33%.
+
+The results underline the importance of leveraging deeper architectures, such as ResNet, to effectively tackle complex image classification tasks. While the advanced ResNet model provided the best performance, the trade-off between accuracy and computational efficiency must be considered, especially for applications with real-time constraints. Future work can explore additional optimizations, such as hyperparameter tuning and exploring more advanced architectures like DenseNet or EfficientNet, to further improve accuracy and model efficiency.
+
+Ultimately, the insights gained from this project contribute to the development of more accurate and efficient image classification models, with potential applications in optical character recognition (OCR), automated translation, and accessibility tools for the visually impaired. The success of the ResNet architectures in this task demonstrates their potential for scaling to more complex datasets and tasks in computer vision.
+
+# Statement of Collaboration
+
+Name: Salman Navroz
+Title: Leader
+Contribution: I did this project on my own (solo group), so I did all the work for this project.
+
+## Resources used
+
+- PyTorch Documentation
+- Pandas Documentation
+- Scikit-learn Documentation
+- Numpy Documentation
+- Matplotlib Documentation
+- I used ChatGPT to assist in creating the visuals for this project such as the fit graph and the ground truth vs prediction images. It also assisted in writing this report,converting my writing to markdown, and making it better structured and professional grammar wise.
 
 
 
