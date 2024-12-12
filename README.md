@@ -126,7 +126,7 @@ The full implementation and exploration for each model can be reviewed in the pr
 
 #### Performance
 
-- **Accuracy**: The basic CNN model achieved a test accuracy of **79.02%%**, which was obtained after training for 10 epochs with a batch size of 128. The validation accuracy after the first epoch was **67.26%**. As the model trained further, the validation accuracy gradually improved.
+- **Accuracy**: The basic CNN model achieved a test accuracy of **79.02%**, which was obtained after training for 10 epochs with a batch size of 128. The validation accuracy after the first epoch was **67.26%**. As the model trained further, the validation accuracy gradually improved.
 
 - **Training Progress**: During training, the loss decreased steadily, with an approximate reduction of 1-0.2 per epoch. The validation loss did not diverge significantly from the training loss, indicating that the model was not overfitting.
 
