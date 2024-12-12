@@ -44,16 +44,6 @@ The notebook for data preprocessing can be found [here](Data_Preprocessing.ipynb
 - `numpy` for array manipulation.
 - `scikit-learn` for splitting datasets.
 
-## Data Exploration
-
-Data exploration was conducted to gain insights into the dataset and identify potential preprocessing needs. Key activities included:
-
-- **Summary Statistics**: Calculating descriptive statistics such as mean, median, and standard deviation for pixel values.
-- **Class Distribution**: Visualizing the frequency of each class to detect class imbalances using bar plots.
-- **Visual Inspection**: Plotting random samples of images to verify data quality and understand variations within classes.
-
-The exploration revealed that some classes were underrepresented, necessitating techniques like data augmentation during training to improve model generalization. Insights from this step informed preprocessing and model design.
-
 ## Model Architectures
 
 Three distinct convolutional neural network (CNN) architectures were implemented and evaluated.
